@@ -1,0 +1,139 @@
+<template>
+  <template if:true={showSpinner}>
+      <lightning-spinner variant="brand" size="large"> </lightning-spinner>
+  </template>
+  <lightning-card>
+          <h3 slot="title">
+              <lightning-icon icon-name="standard:timesheet_entry" size="small"></lightning-icon>
+              &nbsp;Timesheet
+              
+          </h3>
+          <div slot="footer">
+                  
+              <lightning-button-group>
+                  <lightning-button variant="brand" onclick={handleCancel} label="Cancel"></lightning-button>
+                  <lightning-button onclick={handleInsert} icon-name="utility:save" label="Save"></lightning-button>
+                  <lightning-button onclick={handleSubmit} label="Submit"></lightning-button>
+              </lightning-button-group>
+          </div>
+          
+         <!-- <p class="slds-p-horizontal_small">-->
+          
+          <div class="slds-grid slds-gutters slds-m-left_x-small slds-m-bottom_x-small">
+              <div class="slds-col slds-size_1-of-6 " > 
+                  <span >Employee</span>
+                  <div class="slds-m-top_xx-small slds-border_top slds-border_left slds-border_right slds-border_bottom" style="border-radius:0%;">
+                  <lightning-icon icon-name="standard:user" size="small" alternative-text="user" title="user"></lightning-icon>
+                  &nbsp; <b>{currentUserName}</b>
+              </div>
+          </div>
+              <div class="slds-col slds-size_1-of-6 " >
+                  <span >ID</span>
+                  <div class="slds-m-top_xx-small slds-border_top slds-border_left slds-border_right slds-border_bottom" style="border-radius:0%;">
+                  <!--<lightning-icon icon-name="standard:user" size="small" alternative-text="userID" title="userID"></lightning-icon>-->
+                  &nbsp; <b>{currentUserID}</b>
+              
+              </div>
+              </div>
+              <div class="slds-col slds-size_1-of-6 " >
+                  <template if:true={currentDate}>
+                  <lightning-input type="date" name="input1" value={currentDate} onchange={handleDateChange} label="Week beginning from" ></lightning-input>
+              </template>
+              </div>
+              <div class="slds-col slds-size_1-of-6 ">
+                <span>Summary</span>
+                <div class="slds-m-top_xx-small">
+                  <div class="slds-text-heading_medium">{totalHoursOfWeek} TotalHours </div>
+                </div>
+              </div>
+              <div class="slds-col slds-size_1-of-6 " >
+                  <span >Selected Project ID</span>
+                  <div class="slds-m-top_xx-small slds-border_top slds-border_left slds-border_right slds-border_bottom" style="border-radius:0%;">
+                  <!--<lightning-icon icon-name="standard:user" size="small" alternative-text="userID" title="userID"></lightning-icon>-->
+                  &nbsp; <b>{selectedProjectID}</b>
+              </div>
+          </div>
+              <div class="slds-col slds-size_1-of-6 " >
+                  <span >Timesheet ID</span>
+                  <div class="slds-m-top_xx-small slds-border_top slds-border_left slds-border_right slds-border_bottom" style="border-radius:0%;">
+                  <!--<lightning-icon icon-name="standard:user" size="small" alternative-text="userID" title="userID"></lightning-icon>-->
+                  &nbsp; <b>{currentUserID}</b>
+              </div>
+              </div>
+            </div>
+
+             <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
+                <thead>
+                 <tr class="slds-line-height_reset">
+                  <th >
+
+                  </th>
+                  <th width ="15%" class="slds-text-align_center">
+                      <b style="color:red;">*</b> Project
+                  </th>
+                  <template if:true={dates}>
+                  <template for:each={dates} for:item="date">
+                      <th class="" scope="col" key={date}>
+                          <div class="slds-truncate slds-text-align_center" title={date}>{date}</div>
+                        </th>
+                  </template>
+              </template>
+      </tr>
+    </thead>
+    <tbody>
+      <template for:each={projectvsTimesheetLines} for:item="item" >
+      <tr class="slds-hint-parent" key={item.index}>
+          <td >
+              <lightning-icon icon-name="utility:delete" class="iconenablepointerevetns slds-icon slds-input__icon slds-input__icon_right slds-icon-text-default" data-index={item.index} onclick={handleLineDelete} variant="error" size="x-small" alternative-text="Connected" title="Connected"></lightning-icon>
+          </td>
+          <td class="projectCol">
+              <template if:true={projectOptions}>
+              <lightning-combobox
+              name="Project"
+              onchange={handleProjectChange}
+              data-index={item.index}
+              value={defaultProject}
+              placeholder="Select Project"
+              options={projectOptions}
+               ></lightning-combobox>
+              </template>
+          </td>
+          <template for:each={item.days} for:item="day"> 
+              <td data-label={day} key={day}>
+                  <div class="slds-truncate" > 
+                      <lightning-input data-index={item.index} type="number" onchange={handleHourChange} name={day} label="" ></lightning-input>
+                  </div>
+              </td>
+          </template>
+         
+          
+      </tr>
+      </template>
+      <!--Subtotal HTML - Start-->
+      <tr class="slds-hint-parent">
+         
+          <td colspan="2">
+              <b>SubTotal</b>
+          </td>    
+          
+          <template if:true={daysTotal} for:each={daysTotal} for:item="total">       
+          <td  key={total.key}>
+              <div class="slds-truncate" > <lightning-input type="number" name="input1" label="" value={total.value} disabled ></lightning-input></div>
+          </td>
+          </template>
+         
+      </tr>
+      <!-- <tr>
+          <td>
+          </td>
+      </tr> -->
+       <!--Subtotal HTML - Stop-->
+    </tbody>
+              </table>
+         <!-- </p>-->
+         <div class="slds-m-left_small slds-m-top_small">
+        
+         <lightning-button variant="brand-outline" label="Add line" onclick={addNewLine} icon-name="utility:add"  class="slds-m-left_x-small"></lightning-button>
+      </div>
+      </lightning-card>
+  </template>
